@@ -90,12 +90,14 @@ function Square(props) {
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
+      // returns if someone already won the game or if that square is already filled
       if (calculateWinner(squares) || squares[i]) {
         return;
       }
       squares[i] = this.state.xIsNext ? "X" : "O";
       this.setState({
         //concat doesn't mutate the original array
+        // used to merge two arrays
         history: history.concat([
           {
             squares: squares
@@ -110,6 +112,7 @@ function Square(props) {
     jumpTo(step) {
       this.setState({
         stepNumber: step,
+        // === is a strict comparison so that means its type matches AND the conents match
         xIsNext: (step % 2) === 0
       });
     }
