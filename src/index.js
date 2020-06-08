@@ -26,22 +26,6 @@ class Square extends React.Component {
 }
 */
 
-/* VERSION 2
-no longer needs a constructor because square doesn't need to keep track of the game's state
-class Square extends React.Component {
-  render() {
-    return (
-      <button
-        className="square"
-        onClick={() => this.props.onClick()}
-      >
-        {this.props.value}
-      </button>
-    );
-  }
-}
-*/
-
 // change Square from component to function component -> doesn't have their own state
 // takes props as input and returns what should be rendered
 function Square(props) {
@@ -53,50 +37,6 @@ function Square(props) {
   }
   
   class Board extends React.Component {
-    /*
-    constructor(props) {
-      super(props);
-      this.state = {
-        squares : Array(9).fill(null);
-        XisNext = true;
-      };
-    }
-
-    //.slice -> to create a copy of the squares array to modify instead of modifying the actual array itself
-    handleClick(i) {
-      //checks if there is already a winner; if there is, then do nothing
-      if (calculateWinner(squares) || squares[i]) {
-      return;
-      }
-      const squares = this.state.squares.slice();
-      squares[i] = this.state.xIsNext ? 'X' : 'O';
-      this.setState({
-        squares: squares,
-        xIsNext: !this.state.xIsNext,
-      });
-      
-    }
-
-
-    // each square receives a value prop that is X, O, or null
-    renderSquare(i) {
-      return <Square value={this.state.squares[i]} />;
-    }
-     */
-
-     //passing down 2 props from Board to Square
-     /*
-      renderSquare(i) {
-      return (
-        <Square
-          value={this.state.squares[i]}
-          onClick={() => this.handleClick(i)}
-        />
-      );
-    }
-     */
-
-
     //passing props is how info flows; from Board parent -> square child
     renderSquare(i) {
       return (
@@ -139,12 +79,14 @@ function Square(props) {
             squares: Array(9).fill(null)
           }
         ],
+        //keeps tracks of which step we are viewing
         stepNumber: 0,
         xIsNext: true
       };
     }
   
     handleClick(i) {
+      // if go back in time and make a new move, the old "future" moves will be discarded
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
@@ -153,11 +95,13 @@ function Square(props) {
       }
       squares[i] = this.state.xIsNext ? "X" : "O";
       this.setState({
+        //concat doesn't mutate the original array
         history: history.concat([
           {
             squares: squares
           }
         ]),
+        // don't get stuck showing the same move 
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext
       });
@@ -170,16 +114,20 @@ function Square(props) {
       });
     }
   
+    // use the most recent history entry to determine/display game status
     render() {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
   
+      //map history of moves to React elements that represent the buttons on the screen
       const moves = history.map((step, move) => {
         const desc = move ?
           'Go to move #' + move :
           'Go to game start';
         return (
+          //create a list that contains the button
+          // when an element created, React extracts the key property and stores the key directly on the returned element -> each past move has unique ID to it
           <li key={move}>
             <button onClick={() => this.jumpTo(move)}>{desc}</button>
           </li>
